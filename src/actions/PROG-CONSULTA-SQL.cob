@@ -44,7 +44,8 @@
            PERFORM 2000-CONTA-ELEMENTOS-CONSULTA.
            PERFORM 2100-CRIAR-CURSOR.
            PERFORM 3000-MONTA-JSON-RETORNO.
-           PERFORM 4000-FINALIZAR.
+           
+           STOP RUN.
 
       
        1000-CONFIGURAR-HTTP-HEADERS.
@@ -69,6 +70,8 @@
 
                DISPLAY FUNCTION trim(WRK-MSG-ERRO)
                MOVE SPACES TO WRK-MSG-ERRO
+
+               PERFORM 4000-LIBERAR-RECURSOS
                STOP RUN
            END-IF.
       
@@ -101,6 +104,7 @@
                INTO WRK-MSG-ERRO
                DISPLAY FUNCTION trim(WRK-MSG-ERRO)
                MOVE SPACES TO WRK-MSG-ERRO
+               PERFORM 4000-LIBERAR-RECURSOS
                STOP RUN
            END-IF.
        
@@ -142,6 +146,6 @@
     
            DISPLAY "]".
        
-       4000-FINALIZAR.
-           EXEC SQL CONNECT RESET END-EXEC
-           STOP RUN.
+       4000-LIBERAR-RECURSOS.
+           
+           EXEC SQL CONNECT RESET END-EXEC.

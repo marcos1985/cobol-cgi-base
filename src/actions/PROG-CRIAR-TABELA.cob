@@ -39,7 +39,7 @@
            PERFORM 3000-CRIAR-TABELA-TESTE.
            PERFORM 3100-INSERIR-REGISTRO.
            PERFORM 4000-MONTAR-JSON-RETORNO.
-
+           
            STOP RUN.
            
        1000-CONFIGURAR-HTTP-HEADERS.
@@ -73,6 +73,7 @@
                INTO WRK-MSG-ERRO
                DISPLAY FUNCTION trim(WRK-MSG-ERRO)
                MOVE SPACES TO WRK-MSG-ERRO
+               PERFORM 5000-LIBERAR-RECURSOS
                STOP RUN
            END-IF.
            
@@ -97,6 +98,7 @@
                INTO WRK-MSG-ERRO
                DISPLAY FUNCTION trim(WRK-MSG-ERRO)
                MOVE SPACES TO WRK-MSG-ERRO
+               PERFORM 5000-LIBERAR-RECURSOS
                STOP RUN
            END-IF.
        
@@ -117,6 +119,7 @@
                INTO WRK-MSG-ERRO
                DISPLAY FUNCTION trim(WRK-MSG-ERRO)
                MOVE SPACES TO WRK-MSG-ERRO
+               PERFORM 5000-LIBERAR-RECURSOS
                STOP RUN
            END-IF.
 
@@ -126,6 +129,7 @@
            DISPLAY '   "tabela": "teste'.
            DISPLAY "}".
        
-       
+       5000-LIBERAR-RECURSOS.
 
+           EXEC SQL CONNECT RESET END-EXEC.
        
