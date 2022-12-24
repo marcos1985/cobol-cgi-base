@@ -1,5 +1,13 @@
 ### COBOL COM CGI
 
+### Softwares necessários para rodar o projeto
+* GIT
+* Docker 
+* Docker Compose
+* CURL
+
+### Rodando no Linux
+
 #### Baixando o projeto
 git clone https://github.com/marcos1985/cobol-cgi-base.git
 
