@@ -1,0 +1,40 @@
+version: "3.6"
+services:
+
+  cobol-dev:
+    image: hyrumce/cobol-cgi:v1
+    depends_on:
+      - mariadb-dev
+    ports:
+      - "5300:80"
+    volumes:
+      - .:/var/www
+    networks:
+      - backend
+
+  mariadb-dev:
+    image: mariadb:latest
+    #image: mariadb:10.2
+    hostname: cob-dev-db
+    ports:
+      - "33061:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: cob-dev
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+    logging:
+      driver: syslog
+      options:
+        tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
+    networks:
+      - backend
+    restart: on-failure
+    volumes:
+     - ${PWD}/mariadb:/var/lib/mysql
+
+networks:
+  frontend:
+    driver: bridge         
+  backend:
+    driver: bridge

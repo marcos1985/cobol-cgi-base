@@ -1,0 +1,4 @@
+cgi-bin/dist/*
+cgi-bin/__pycache__
+mariadb/
+config.py
