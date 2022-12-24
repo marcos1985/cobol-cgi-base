@@ -13,6 +13,9 @@ chmod +x cgi-bin/gateway.py
 
 # ======================================== COMPILAÇÃO ===================================================
 
+# Criar pasta cgi-bin/dist
+mkdir -p  cgi-bin/dist
+
 # >> src/actions/PROG-CHAMADA-ESTATICA.cob
 if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-CHAMADA-ESTATICA" ) ]]; then
 
