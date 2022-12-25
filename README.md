@@ -79,7 +79,7 @@
 				esqlOC  -static -o PROG01.sql.cob src/actions/PROG01.cob <br>
 				cobc -x -static -locsql -o PROG01 PROG01.sql.cob
 				
-* Usando módulo auxiliar e com pré-processamento SQLL:
+* Usando módulo auxiliar e com pré-processamento SQL:
 	* **Sintaxe**: <br>
 		cobc -c -o [nome do código objeto da lib] [código fonte da lib] <br>
 		esqlOC  -static -o [nome arquivo processado] [código fonte]  <br>
