@@ -173,7 +173,7 @@ Cobol. Cada programa deve ter sua seção na área de compilação.
 * Porta MariaDB:   33061
 
 #### TESTAR COM CURL OU POSTMAN/INSOMNIA
-> Execute em sequência para a criação da tabele teste.
+> Execute em sequência para a criação da tabela teste.
 
 * curl http://localhost:5300/cgi-bin/gateway.py?action=CHAMADA-ESTATICA
 * curl http://localhost:5300/cgi-bin/gateway.py?action=CRIAR-TABELA-TESTE
