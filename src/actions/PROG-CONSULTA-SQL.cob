@@ -12,18 +12,24 @@
 
        WORKING-STORAGE SECTION.
 
-       01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
+       01  WRK-NEWLINE                     PIC X           VALUE x'0a'.
 
        77  WRK-TEST-ID-MASK                PIC Z(8)9.
-       77  WRK-CONTADOR                    PIC 9(10) VALUE ZERO.
+       77  WRK-CONTADOR                    PIC 9(10)       VALUE ZERO.
+       
        77  WRK-MSG-ERRO                    PIC X(255).
+       77  WRK-MSG-EXP-ERRO                PIC X(255).
+       
+       77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
+       77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
+
        77  WRK-DB-STRING                   PIC X(255).
+       
 
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.
        
        01  HOSTVARS.
            05 BUFFER     PIC X(1024).
-           05 SQL-BUFFER     PIC X(1024).
            05 HVARD      PIC S9(5)V99.
            05 HVARC      PIC  X(50).
            05 HVARN      PIC  9(12).
@@ -39,43 +45,56 @@
 
        MAIN-PROCEDURE.
            
-           PERFORM 1000-CONFIGURAR-HTTP-HEADERS.
-           PERFORM 1100-CONECTA-BANCO-DE-DADOS.
-           PERFORM 2000-CONTA-ELEMENTOS-CONSULTA.
-           PERFORM 2100-CRIAR-CURSOR.
-           PERFORM 3000-MONTA-JSON-RETORNO.
+           PERFORM PROC-SETAR-CABECALHO-HTTP.
+           PERFORM PROC-CONECTAR-BANCO-COB-DEV.
+           PERFORM PROC-CONTAR-ELEMENTOS-CONSULTA-TESTE.
+           PERFORM PROC-CRIAR-CURSOR-CONSULTA-TESTE.
+           PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
            
            STOP RUN.
+       
+       PROC-LIBERAR-RECURSOS.
+           EXEC SQL CONNECT RESET END-EXEC.
+       
+       PROC-VERIFICAR-EXEC-SQL.
+           
+           IF  SQLCODE NOT EQUAL ZERO 
+               MOVE "ERRO AO INTERAGIR COM A BASE DE DADOS."
+                   TO WRK-MSG-ERRO
+               MOVE SQLERRM TO WRK-MSG-EXP-ERRO
+               PERFORM PROC-RETORNAR-RESPOSTA-HTTP-500
+           END-IF.
 
-      
-       1000-CONFIGURAR-HTTP-HEADERS.
+       PROC-RETORNAR-RESPOSTA-HTTP-500.
+           
+           PERFORM PROC-LIBERAR-RECURSOS.
+
+           DISPLAY '{'.
+           DISPLAY '"http-status": ' WRK-HTTP-STATUS-500 ','.
+           DISPLAY '"msg": "' FUNCTION trim(WRK-MSG-ERRO) '",'.
+           DISPLAY '"exp-msg": "' FUNCTION trim(WRK-MSG-EXP-ERRO) '",'.
+           DISPLAY '"data": null'.
+           DISPLAY '}'.
+
+           STOP RUN.
+
+       PROC-SETAR-CABECALHO-HTTP.
     
            DISPLAY "Access-Control-Allow-Origin: *".
            DISPLAY "Content-type: application/json".
            DISPLAY WRK-NEWLINE. 
        
-       1100-CONECTA-BANCO-DE-DADOS. 
+       PROC-CONECTAR-BANCO-COB-DEV. 
 
            ACCEPT WRK-DB-STRING 
            FROM ENVIRONMENT "DB_CONNECTION_STRING_COB_DEV".
 
            MOVE WRK-DB-STRING TO BUFFER.
            EXEC SQL CONNECT TO :BUFFER END-EXEC.
-           
-           IF  SQLCODE NOT EQUAL ZERO 
-               STRING 
-                   "ERRO AO TENTAR ABIR CONEXÃO COM O "
-                   "BANDO DE DADOS."
-               INTO WRK-MSG-ERRO
 
-               DISPLAY FUNCTION trim(WRK-MSG-ERRO)
-               MOVE SPACES TO WRK-MSG-ERRO
-
-               PERFORM 4000-LIBERAR-RECURSOS
-               STOP RUN
-           END-IF.
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
       
-       2000-CONTA-ELEMENTOS-CONSULTA.
+       PROC-CONTAR-ELEMENTOS-CONSULTA-TESTE.
            
            EXEC SQL 
                SELECT
@@ -84,7 +103,9 @@
                FROM teste
            END-EXEC.
 
-       2100-CRIAR-CURSOR.
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
+
+       PROC-CRIAR-CURSOR-CONSULTA-TESTE.
 
            EXEC SQL
                DECLARE CUR-TESTE CURSOR FOR 
@@ -93,26 +114,22 @@
                    nome
                FROM teste
            END-EXEC
-       
+
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
+
            EXEC SQL
                OPEN CUR-TESTE
            END-EXEC
-
-           IF  SQLCODE NOT EQUAL ZERO 
-               STRING 
-                   "ERRO AO TENTAR CRIAR CURSOR "
-               INTO WRK-MSG-ERRO
-               DISPLAY FUNCTION trim(WRK-MSG-ERRO)
-               MOVE SPACES TO WRK-MSG-ERRO
-               PERFORM 4000-LIBERAR-RECURSOS
-               STOP RUN
-           END-IF.
-       
-      
-       
-       3000-MONTA-JSON-RETORNO. 
            
-           DISPLAY "[".
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
+       
+           
+       PROC-RETORNAR-RESPOSTA-HTTP-200.
+
+           DISPLAY '{'.
+           DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
+           DISPLAY '"msg": null,'.
+           DISPLAY '"data" : ['.
            
            PERFORM UNTIL SQLCODE = 100
                
@@ -130,11 +147,11 @@
     
                    MOVE TEST-ID TO WRK-TEST-ID-MASK
     
-                   DISPLAY '   {'
-                       DISPLAY '    "id": ' WRK-TEST-ID-MASK ', '
-                       DISPLAY '    "nome": "' 
+                   DISPLAY '{'
+                   DISPLAY '"id": ' WRK-TEST-ID-MASK ', '
+                   DISPLAY '"nome": "' 
                                        FUNCTION trim(TEST-NOME) '"'
-                   DISPLAY '   }'
+                   DISPLAY '}'
                    
                    IF WRK-CONTADOR < TEST-QTD THEN 
                        DISPLAY ", "
@@ -144,8 +161,5 @@
     
            END-PERFORM.
     
-           DISPLAY "]".
-       
-       4000-LIBERAR-RECURSOS.
-           
-           EXEC SQL CONNECT RESET END-EXEC.
+           DISPLAY ']'.
+           DISPLAY '}'.

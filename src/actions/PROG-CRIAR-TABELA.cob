@@ -16,6 +16,10 @@
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
 
        77  WRK-MSG-ERRO                    PIC X(255).
+       77  WRK-MSG-EXP-ERRO                PIC X(255).
+       
+       77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
+       77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
        77  WRK-DB-STRING                   PIC X(255).
 
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.
@@ -34,32 +38,58 @@
 
        MAIN-PROCEDURE.
            
-           PERFORM 1000-CONFIGURAR-HTTP-HEADERS.
-           PERFORM 2000-ABIR-CONEXAO-BANCO-DE-DADOS.
-           PERFORM 3000-CRIAR-TABELA-TESTE.
-           PERFORM 3100-INSERIR-REGISTRO.
-           PERFORM 4000-MONTAR-JSON-RETORNO.
+           PERFORM PROC-SETAR-CABECALHO-HTTP.
+           PERFORM PROC-CONECTAR-BANCO-COB-DEV.
+           PERFORM PROC-CRIAR-TABELA-TESTE.
+           PERFORM PROC-INSERIR-REGISTRO.
+           PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
            
            STOP RUN.
            
-       1000-CONFIGURAR-HTTP-HEADERS.
+       PROC-LIBERAR-RECURSOS.
+           EXEC SQL CONNECT RESET END-EXEC.
+       
+       PROC-VERIFICAR-EXEC-SQL.
+           
+           IF  SQLCODE NOT EQUAL ZERO 
+               MOVE "ERRO AO INTERAGIR COM A BASE DE DADOS."
+                   TO WRK-MSG-ERRO
+               MOVE SQLERRM TO WRK-MSG-EXP-ERRO
+               PERFORM PROC-RETORNAR-RESPOSTA-HTTP-500
+           END-IF.
 
+       PROC-RETORNAR-RESPOSTA-HTTP-500.
+           
+           PERFORM PROC-LIBERAR-RECURSOS.
+
+           DISPLAY '{'.
+           DISPLAY '"http-status": ' WRK-HTTP-STATUS-500 ','.
+           DISPLAY '"msg": "' FUNCTION trim(WRK-MSG-ERRO) '",'.
+           DISPLAY '"exp-msg": "' FUNCTION trim(WRK-MSG-EXP-ERRO) '",'.
+           DISPLAY '"data": null'.
+           DISPLAY '}'.
+
+           STOP RUN.
+
+       PROC-SETAR-CABECALHO-HTTP.
+    
            DISPLAY "Access-Control-Allow-Origin: *".
            DISPLAY "Content-type: application/json".
-           DISPLAY WRK-NEWLINE.
-
+           DISPLAY WRK-NEWLINE. 
        
-       2000-ABIR-CONEXAO-BANCO-DE-DADOS.
-           
+       PROC-CONECTAR-BANCO-COB-DEV. 
+
            ACCEPT WRK-DB-STRING 
            FROM ENVIRONMENT "DB_CONNECTION_STRING_COB_DEV".
 
            MOVE WRK-DB-STRING TO BUFFER.
            EXEC SQL CONNECT TO :BUFFER END-EXEC.
+
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
       
-       3000-CRIAR-TABELA-TESTE.
+       PROC-CRIAR-TABELA-TESTE.
            
-           MOVE SPACES TO BUFFER;
+           MOVE SPACES TO BUFFER.
 
            STRING 'DROP TABLE IF EXISTS teste;' INTO BUFFER.
 
@@ -67,17 +97,9 @@
                EXECUTE IMMEDIATE :BUFFER
            END-EXEC.
 
-           IF  SQLCODE NOT EQUAL ZERO 
-               STRING 
-                   "ERRO AO TENTAR EXCLUIR TABELA."
-               INTO WRK-MSG-ERRO
-               DISPLAY FUNCTION trim(WRK-MSG-ERRO)
-               MOVE SPACES TO WRK-MSG-ERRO
-               PERFORM 5000-LIBERAR-RECURSOS
-               STOP RUN
-           END-IF.
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
            
-           MOVE SPACES TO BUFFER;
+           MOVE SPACES TO BUFFER.
 
            STRING 
                'CREATE TABLE teste'
@@ -92,44 +114,31 @@
                EXECUTE IMMEDIATE :BUFFER
            END-EXEC.
 
-           IF  SQLCODE NOT EQUAL ZERO 
-               STRING 
-                   "ERRO AO TENTAR CRIAR TABELA."
-               INTO WRK-MSG-ERRO
-               DISPLAY FUNCTION trim(WRK-MSG-ERRO)
-               MOVE SPACES TO WRK-MSG-ERRO
-               PERFORM 5000-LIBERAR-RECURSOS
-               STOP RUN
-           END-IF.
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
+
        
-       3100-INSERIR-REGISTRO.
+       PROC-INSERIR-REGISTRO.
            
-           MOVE 'R1D6' TO NOME.
+           MOVE 'R1D8' TO NOME.
 
            EXEC SQL
                INSERT INTO teste (nome)
                VALUES (:NOME)
            END-EXEC.
+           
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
 
            EXEC SQL COMMIT END-EXEC.
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
 
-           IF  SQLCODE NOT EQUAL ZERO 
-               STRING 
-                   "ERRO AO TENTAR INSERIR REGISTRO."
-               INTO WRK-MSG-ERRO
-               DISPLAY FUNCTION trim(WRK-MSG-ERRO)
-               MOVE SPACES TO WRK-MSG-ERRO
-               PERFORM 5000-LIBERAR-RECURSOS
-               STOP RUN
-           END-IF.
-
-       4000-MONTAR-JSON-RETORNO.
+       
+       PROC-RETORNAR-RESPOSTA-HTTP-200.
 
            DISPLAY '{'.
-           DISPLAY '   "tabela": "teste'.
+           DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
+           DISPLAY '"msg": null,'.
+           DISPLAY '"data":'.
+               DISPLAY '{'.
+               DISPLAY '   "tabela": "teste"'.
+               DISPLAY "}".
            DISPLAY "}".
-       
-       5000-LIBERAR-RECURSOS.
-
-           EXEC SQL CONNECT RESET END-EXEC.
-       
