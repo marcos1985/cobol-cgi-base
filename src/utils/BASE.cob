@@ -55,8 +55,6 @@
 
        
        PROC-RETORNAR-RESPOSTA-HTTP-200.
-           
-           MOVE WRK-ID-CLIENTE TO WRK-ID-MASK.
 
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
