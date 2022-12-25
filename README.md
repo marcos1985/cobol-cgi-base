@@ -50,8 +50,8 @@
    > Pasta sugerida para criação de modulos auxiliares dos programas cobol
 
 * src/util/base.cob:
-	> Código fonte com a estrutura básica que pode ser usado com referência para
-	criação de enpoints.
+	> Código fonte com a estrutura básica que pode ser usado como referência para
+	criação de endpoints.
 
 
 
