@@ -5,7 +5,7 @@
 * Explorar as possibilidades de usar o Cobol para criação de micro serviços.
 
 ### LIMITAÇÕES
-* Só pega parametros via QUERY-STRING. Pegar dados do corpo da 
+* Só pega parâmetros via QUERY-STRING. Pegar dados do corpo da 
  requisição está em planejamento para ser implementado.
 * Somente acessa bancos de dados MariaDB, MYSQL e POSTGRESQL.
 * Módulos auxiliares aos programas Cobol só podem ser compilados de forma estática.
