@@ -154,7 +154,7 @@ Cobol. Cada programa deve ter sua seção na área de compilação.
 	
 ### ENTENDENDO O ARQUIVO ROUTES.PY
 
-> Arquivo contendo o de-para entre a action passada na url e o binário Cobol que deve ser executado na pasta cgi-dist/dist
+> Arquivo contendo o de-para entre a action passada na url e o binário Cobol que deve ser executado na pasta cgi-bin/dist
 
 ``` python
 
