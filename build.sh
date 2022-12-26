@@ -32,7 +32,7 @@ mkdir -p  cgi-bin/dist
 esqlOC  -static -o MOD-DYN-SQL.sql.cob src/libs/MOD-DYN-SQL.cob
 cobc -m -static -locsql -o MOD-DYN-SQL.so MOD-DYN-SQL.sql.cob
 cp MOD-DYN-SQL.so cgi-bin/dist
-#rm MOD-DYN-SQL.sql.cob
+rm MOD-DYN-SQL.sql.cob
 rm MOD-DYN-SQL.so
 mostar_sucesso_falha "MOD-DYN-SQL"
 echo ""

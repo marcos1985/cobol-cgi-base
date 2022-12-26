@@ -77,7 +77,7 @@
                INTO :QTD-REG
                FROM teste
            END-EXEC.
-           MODE QTD-REG TO LS-QTD-REGISTRO.
+           MOVE QTD-REG TO LS-QTD-REGISTRO.
            PERFORM PROC-VERIFICAR-EXEC-SQL.
 
        PROC-SETAR-VARIAVEIS-DE-RETORNO.
