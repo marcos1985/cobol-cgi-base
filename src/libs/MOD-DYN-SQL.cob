@@ -30,13 +30,15 @@
 
        LINKAGE SECTION.
 
-       77  LS-QTD-REGISTRO   PIC 9(10).
+       77  LS-QTD-REGISTRO   PIC 9(10)   VALUE 0.
        77  LS-FLAG-ERRO      PIC 9(01)   VALUE 0.
-       77  LS-MSG-ERRO       PIC X(255).
+       77  LS-MSG-ERRO       PIC X(255)  VALUE SPACES.
 
 
-       PROCEDURE DIVISION.
-
+       PROCEDURE DIVISION USING LS-QTD-REGISTRO,
+                                LS-FLAG-ERRO,
+                                LS-MSG-ERRO.
+       
        MAIN-PROCEDURE.
            
            PERFORM PROC-CONECTAR-BANCO-COB-DEV.
@@ -44,6 +46,8 @@
            PERFORM PROC-SETAR-VARIAVEIS-DE-RETORNO.
            PERFORM PROC-LIBERAR-RECURSOS.
            EXIT PROGRAM.
+      
+       
        
        PROC-LIBERAR-RECURSOS.
            EXEC SQL CONNECT RESET END-EXEC.
@@ -77,7 +81,9 @@
                INTO :QTD-REG
                FROM teste
            END-EXEC.
-           MOVE QTD-REG TO LS-QTD-REGISTRO.
+
+      *    DISPLAY "QTD 01 => " QTD-REG.
+           
            PERFORM PROC-VERIFICAR-EXEC-SQL.
 
        PROC-SETAR-VARIAVEIS-DE-RETORNO.

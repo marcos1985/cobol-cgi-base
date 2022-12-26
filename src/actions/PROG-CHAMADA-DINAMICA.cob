@@ -14,14 +14,16 @@
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
        01  WRK-RETURN                      PIC X(255). 
 
-       77  WRK-MSG-ERRO                    PIC X(255).
+       77  WRK-MSG-ERRO                    PIC X(255) VALUE SPACES.
        77  WRK-MSG-EXP-ERRO                PIC X(255).
        
        77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
        77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
 
-       77  WRK-QTD-REGISTRO   PIC 9(10).
+       77  WRK-QTD-REGISTRO   PIC 9(10)     VALUE 0.
        77  WRK-FLAG-ERRO      PIC 9(1)      VALUE 0.
+       
+       77  WRK-QTD-REGISTRO-MASK            PIC Z(9)9     VALUE 0.
 
        PROCEDURE DIVISION.
 
@@ -32,7 +34,6 @@
            PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
            PERFORM PROC-LIBERAR-RECURSOS.
            STOP RUN.
-       
 
        PROC-LIBERAR-RECURSOS.
            CONTINUE.
@@ -57,9 +58,9 @@
            DISPLAY WRK-NEWLINE. 
 
        PROC-CHAMA-MOD-TESTA-CALL.
-           
+
            CALL 'MOD-DYN-SQL' 
-                 USING WRK-QTD-REGISTRO,   
+                 USING WRK-QTD-REGISTRO,
                        WRK-FLAG-ERRO,
                        WRK-MSG-ERRO
            END-CALL.
@@ -70,12 +71,14 @@
        
        PROC-RETORNAR-RESPOSTA-HTTP-200.
            
+           MOVE WRK-QTD-REGISTRO TO WRK-QTD-REGISTRO-MASK.
+
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
            DISPLAY '"msg": null,'.
            DISPLAY '"data":'.
                DISPLAY '{'.
                DISPLAY '   "qtd-registros": "' 
-                            FUNCTION trim(WRK-QTD-REGISTRO) '"'.
+                            FUNCTION trim(WRK-QTD-REGISTRO-MASK) '"'.
                DISPLAY "}".
            DISPLAY "}".
