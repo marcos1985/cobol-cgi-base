@@ -27,6 +27,7 @@
            PERFORM PROC-SETAR-CABECALHO-HTTP.
            PERFORM PROC-CHAMA-MOD-TESTA-CALL.
            PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
+           PERFORM PROC-LIBERAR-RECURSOS.
            STOP RUN.
        
 
@@ -66,3 +67,4 @@
                             FUNCTION trim(WRK-RETURN) '"'.
                DISPLAY "}".
            DISPLAY "}".
+           

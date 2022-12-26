@@ -1,5 +1,17 @@
 #!/usr/bin/bash
 
+# ======================================= Functions =====================================================
+
+mostar_sucesso_falha() {
+    
+    if [ $? -eq 0 ]; then 
+        printf "\xE2\x9C\x85 $1"
+    else 
+        printf "\xF0\x9F\x9A\xAB $1"
+    fi
+
+}
+
 # ======================================== SETUP INICICAL =============================================== 
 
 if [ $# -lt 1 ]; then
@@ -15,6 +27,16 @@ chmod +x cgi-bin/gateway.py
 
 # Criar pasta cgi-bin/dist
 mkdir -p  cgi-bin/dist
+
+# Compilar LIBS
+esqlOC  -static -o MOD-DYN-SQL.sql.cob src/libs/MOD-DYN-SQL.cob
+cobc -m -static -locsql -o MOD-DYN-SQL.so MOD-DYN-SQL.sql.cob
+cp MOD-DYN-SQL.so cgi-bin/dist
+#rm MOD-DYN-SQL.sql.cob
+rm MOD-DYN-SQL.so
+mostar_sucesso_falha "MOD-DYN-SQL"
+echo ""
+
 
 # >> src/actions/PROG-CHAMADA-ESTATICA.cob
 if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-CHAMADA-ESTATICA" ) ]]; then
@@ -97,6 +119,28 @@ if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-CONSULTA-SQL" ) ]]; then
         printf "\xF0\x9F\x9A\xAB PROG-CONSULTA-SQL"
     fi
 
+    echo ""
+fi
+
+# >> src/actions/PROG-CHAMADA-DINAMICA.cob
+if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-CHAMADA-DINAMICA" ) ]]; then
+
+    rm -f cgi-bin/dist/MOD-DYN.so
+    rm -f cgi-bin/dist/PROG-CHAMADA-DINAMICA
+
+    cobc -m src/libs/MOD-DYN.cob
+    cp MOD-DYN.so cgi-bin/dist
+    rm MOD-DYN.so
+
+    cobc -x -o PROG-CHAMADA-DINAMICA src/actions/PROG-CHAMADA-DINAMICA.cob
+    cp PROG-CHAMADA-DINAMICA cgi-bin/dist
+    rm PROG-CHAMADA-DINAMICA
+
+    if [ $? -eq 0 ]; then 
+        printf "\xE2\x9C\x85 PROG-CHAMADA-DINAMICA"
+    else 
+        printf "\xF0\x9F\x9A\xAB PROG-CHAMADA-DINAMICA"
+    fi
     echo ""
 fi
 

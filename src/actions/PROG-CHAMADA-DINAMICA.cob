@@ -1,41 +1,39 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PROG-QUERY-STRING.
+       PROGRAM-ID. PROG-CH-DYN.
       *******************************************
-      * AUTOR    : 
-      * DATA     : 
+      * AUTOR: 
+      * DATA: 
       ******************************************* 
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
-       
        DATA DIVISION.
        FILE SECTION.
-
        WORKING-STORAGE SECTION.
-       
+
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
-       
+       01  WRK-RETURN                      PIC X(255). 
+
        77  WRK-MSG-ERRO                    PIC X(255).
        77  WRK-MSG-EXP-ERRO                PIC X(255).
        
        77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
        77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
 
-
-       77  WRK-ID-MASK                     PIC Z(8)9.
-       77  WRK-ID-CLIENTE                  PIC 9(10).
-       77  WRK-NOME-CLIENTE                PIC X(255).
+       77  WRK-QTD-REGISTRO   PIC 9(10).
+       77  WRK-FLAG-ERRO      PIC 9(1)      VALUE 0.
 
        PROCEDURE DIVISION.
 
        MAIN-PROCEDURE.
            
            PERFORM PROC-SETAR-CABECALHO-HTTP.
-           PERFORM PROC-PROCESSAR-QUERY_STRING.
+           PERFORM PROC-CHAMA-MOD-TESTA-CALL.
            PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
            PERFORM PROC-LIBERAR-RECURSOS.
            STOP RUN.
-           
+       
+
        PROC-LIBERAR-RECURSOS.
            CONTINUE.
 
@@ -51,32 +49,33 @@
            DISPLAY '}'.
 
            STOP RUN.
+       
 
-
-       PROC-SETAR-CABECALHO-HTTP.
-              
+       PROC-SETAR-CABECALHO-HTTP.    
            DISPLAY "Access-Control-Allow-Origin: *".
            DISPLAY "Content-type: application/json".
-           DISPLAY WRK-NEWLINE.
+           DISPLAY WRK-NEWLINE. 
 
-       PROC-PROCESSAR-QUERY_STRING.
+       PROC-CHAMA-MOD-TESTA-CALL.
            
-           ACCEPT WRK-ID-CLIENTE FROM ENVIRONMENT "QS_ID".
-           ACCEPT WRK-NOME-CLIENTE FROM ENVIRONMENT "QS_NOME".
+           CALL 'MOD-DYN-SQL' 
+                 USING WRK-QTD-REGISTRO,   
+                       WRK-FLAG-ERRO,
+                       WRK-MSG-ERRO
+           END-CALL.
+
+           IF WRK-FLAG-ERRO NOT EQUAL ZERO THEN 
+               PERFORM PROC-RETORNAR-RESPOSTA-HTTP-500
+           END-IF.
        
        PROC-RETORNAR-RESPOSTA-HTTP-200.
            
-           MOVE WRK-ID-CLIENTE TO WRK-ID-MASK.
-
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
            DISPLAY '"msg": null,'.
            DISPLAY '"data":'.
                DISPLAY '{'.
-               DISPLAY '   "id": ' WRK-ID-MASK ','.
-               DISPLAY '   "nome": "' 
-                                   FUNCTION trim(WRK-NOME-CLIENTE) '"'.
+               DISPLAY '   "qtd-registros": "' 
+                            FUNCTION trim(WRK-QTD-REGISTRO) '"'.
                DISPLAY "}".
            DISPLAY "}".
-       
-      

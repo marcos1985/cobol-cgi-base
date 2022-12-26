@@ -8,7 +8,6 @@
 * Só pega parâmetros via QUERY-STRING. Pegar dados do corpo da 
  requisição está em planejamento para ser implementado.
 * Somente acessa bancos de dados MariaDB, MYSQL e POSTGRESQL.
-* Módulos auxiliares aos programas Cobol só podem ser compilados de forma estática.
 * Para compilar programas que acessam banco de dados é usado um pré-processador de SQL.
 * A passagem de configurações é feita de forma manual no arquivo gateway.py
 
@@ -56,40 +55,29 @@
 
 
 ### COMO COMPILAR UM PROGRAMA COBOL
-* Sem usar um modulo auxiliar:
+* Compilar programa executável:
 	* **Sintaxe**: cobc -x -o [nome do executável] [código fonte]
 	* **Exemplo**: cobc -x -o PROG01 src/actions/PROG01.cob
-	
-* Usando um ou mais módulo(s) auxiliar(es):
-	* **Sintaxe**: <br>
-		cobc -c -o [nome do código objeto da lib] [código fonte da lib]<br>
-		cobc -x -o [nome do executável] [código fonte] [nome do código objeto] ... [nome do código objeto] <br>
-	* **Exemplo 01**: <br>
-				cobc -c -o  MOD01 src/lib/MOD01.cob <br>
-				cobc -x -o  PROG01 src/actions/PROG01.cob MOD01.o
+
+* Compilar programa que sera carregado de forma dinamica (.so):
+	* **Sintaxe**: cobc -m -o [nome da lib (colocar .so no final)] [código fonte]
+	* **Exemplo**: cobc -m -o MOD02.so src/libs/MOD02.cob
 				
-	* **Exemplo 02**: <br>
-				cobc -c -o  MOD01 src/lib/MOD01.cob <br>
-				cobc -c -o  MOD02 src/lib/MOD02.cob <br>
-				cobc -x -o  PROG01 src/actions/PROG01.cob MOD01.o MOD02.o
-				
-* Com pré-processamento SQL:
+* Compilar programa que acessa banco de dados:
 	* **Sintaxe**: <br>
 		esqlOC  -static -o [nome arquivo processado] [código fonte]  <br>
 		cobc -x -static -locsql -o [nome do executável]  [nome arquivo processado]  <br>
 	* **Exemplo**: <br>
 				esqlOC  -static -o PROG01.sql.cob src/actions/PROG01.cob <br>
 				cobc -x -static -locsql -o PROG01 PROG01.sql.cob
-				
-* Usando módulo auxiliar e com pré-processamento SQL:
+
+* Compilar programa, que acessa banco de dados, que sera carregado de forma dinamica (.so):
 	* **Sintaxe**: <br>
-		cobc -c -o [nome do código objeto da lib] [código fonte da lib] <br>
 		esqlOC  -static -o [nome arquivo processado] [código fonte]  <br>
-		cobc -x -static -locsql -o [nome do executável]  [nome arquivo processado]  <br>
+		cobc -m -static -locsql -o [nome da lib (colocar .so no final)]  [nome arquivo processado]  <br>
 	* **Exemplo**: <br>
-				cobc -c -o  MOD01 src/lib/MOD01.cob <br>
 				esqlOC  -static -o PROG01.sql.cob src/actions/PROG01.cob <br>
-				cobc -x -static -locsql -o PROG01 PROG01.sql.cob MOD01.o
+				cobc -m -static -locsql -o PROG01 PROG01.sql.cob
 
 
 ### EXPLICANDO O ARQUIVO BUILD.SH

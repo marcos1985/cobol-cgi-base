@@ -2,7 +2,7 @@ version: "3.6"
 services:
 
   cobol-dev:
-    image: hyrumce/cobol-cgi:v1
+    image: hyrumce/cobol-cgi:v2
     depends_on:
       - mariadb-dev
     ports:
