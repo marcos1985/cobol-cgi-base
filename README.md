@@ -163,6 +163,29 @@ Ex: /professor/:id/disciplina/:id/tutorados<br>
 
 ```
 
+### USANDO PARÂMETROS VIA QUERY STRING
+
+> Todo parâmetro passado via QUERY-STRING é acessado no código Cobol com um QS_ na frente do nome do parâmetro. Tudo deve ficar em caixa alta.
+
+```cobol
+
+	ACCEPT WRK-ID-CLIENTE FROM ENVIRONMENT "QS_ID".
+    ACCEPT WRK-NOME-CLIENTE FROM ENVIRONMENT "QS_NOME".
+
+```
+
+
+### POST/PUT COM JSON NO BODY DA REQUISIÇÃO
+
+> O JSON passado nas requisições POST e PUT é acessado no Cobol por meio da variável de ambiente REQUEST-BODY. Você precisa fazer o parse do JSON dentro do cobol.  
+
+
+```cobol
+
+	ACCEPT WRK-JSON FROM ENVIRONMENT "REQUEST-BODY".
+
+```
+
 #### PORTAS EXPOSTAS
 
 * Porta COBOL:     5300
