@@ -1,6 +1,5 @@
 import os
 import sys
-import cgi
 import routes as rt
 import config as cf
 
