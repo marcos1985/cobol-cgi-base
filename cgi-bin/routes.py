@@ -1,9 +1,10 @@
 
-rotas = {}
+from router import Router
+ 
+router = Router()
 
-rotas["CHAMADA-ESTATICA"]                   = "PROG-CHAMADA-ESTATICA"
-rotas["CRIAR-TABELA-TESTE"]                 = "PROG-CRIAR-TABELA"
-rotas["RECEBER-QUERY-STRING"]               = "PROG-QUERY-STRING"
-rotas["CONSULTAR-TABELA-TESTE"]             = "PROG-CONSULTA-SQL"
-rotas["CHAMADA-DINAMICA"]                   = "PROG-CHAMADA-DINAMICA"
-
+router.get(path="/cobweb/teste/criar-tabela", cobol_program="PROG-CRIAR-TABELA")
+router.get(path="/cobweb/teste/consulta-tabela", cobol_program="PROG-CONSULTA-SQL")
+router.get(path="/cobweb/teste/chamada-estatica", cobol_program="PROG-CHAMADA-ESTATICA")
+router.get(path="/cobweb/teste/chamada-dinamica", cobol_program="PROG-CHAMADA-DINAMICA")
+router.get(path="/cobweb/teste/chamada-query-string", cobol_program="PROG-QUERY-STRING")

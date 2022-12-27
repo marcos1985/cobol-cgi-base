@@ -1,60 +1,71 @@
-    #!/usr/bin/python3
-import time
+#!/usr/bin/python3
 
-begin_exec = time.time()
+from cob_web import CobWeb
 
-import sys
-import os
-from urllib.parse import urlparse, parse_qs
+CobWeb.run()
 
-# Importa as rotas do micro serviço.
-import routes as rt
+# import sys
+# import os
+# import cgi
 
-def action_not_found():
-    print("Access-Control-Allow-Origin: *")
-    print("Content-type: application/json")
-    print("\n")
-    print("Action não encontrada")
-    sys.exit()
+# # print(os.environ)
+# # sys.exit()
 
-# Monta o caminho base dos binários em cobol
-directory = os.getcwd()
-dist_path = directory + "/dist"
+# # Importa as rotas do micro serviço.
+# import routes as rt
 
-# Pega os paramentros passados via QUERY_STRING
-agrs = dict(item.split('=') for item in os.environ['QUERY_STRING'].split('&') if item)
-
-# Pega a action solicitada pelo usuário
-action = agrs.get("action")
-
-if not action:
-    action_not_found()
-
-# Pega o nome do binário correspondente a rota
-prog_cobol = rt.rotas.get(action, None)
-
-# Se não tem, mostra a mensagem de erro
-if not prog_cobol:
-    action_not_found()
+# def action_not_found():
+#     print("Access-Control-Allow-Origin: *")
+#     print("Content-type: application/json")
+#     print("\n")
+#     print("Action não encontrada")
+#     sys.exit()
 
 
-# Setar as variaveis de ambiente para a execução
+# # # Monta o caminho base dos binários em cobol
+# directory = os.getcwd()
+# dist_path = directory + "/dist"
 
-# Strings de conecção de banco de dados.
-import config as cf
-os.environ["DB_CONNECTION_STRING_COB_DEV"] = cf.DB_CONNECTION_STRING_COB_DEV
+# # # Pega os paramentros passados via QUERY_STRING
+# # #agrs = dict(item.split('=') for item in os.environ['QUERY_STRING'].split('&') if item)
+# agrs = cgi.parse()
 
-# QUERY-STRINGS args
-for key, value in agrs.items():
-    os.environ["QS_" + str(key).upper()] = str(value).replace("%20", " ")
 
-# Setar os dados via post. Ex: PS_ID, PS_NOME ...
+# # Pegar programa cobol correspondente
+# prog_cobol, path_params = rt.router.get_prog_cobol(http_method=os.environ["REQUEST_METHOD"], path=os.environ["REQUEST_URI"])
 
-# Executa o binário
-os.system(dist_path + "/" + prog_cobol)
-#os.system("cobcrun "+  dist_path + "/" + prog_cobol)
+# # Se não tem, mostra a mensagem de erro
+# if not prog_cobol:
+#     action_not_found()
 
-# Mostrar tempo de excução
-end_exec = time.time()
-#sys.stderr.write("[INFO][" + action +"] TEMPO DE EXECUÇÃO EM SEGUNDOS: " + str(end_exec - begin_exec))
-    
+# # Setando os parametros do path
+# i = 0
+
+# for path_param in path_params:
+
+#     if isinstance(path_param, tuple):
+#         for item in path_param:
+#             i += 1
+#             os.environ["PATH-PARAM-" + str(i)] = item
+#     else:
+#         i += 1
+#         os.environ["PATH-PARAM-" + str(i)] = path_param
+
+
+# # setar configurações
+# import config as cf
+
+# for config in cf.config_list:
+#     os.environ[config['key']] = config['value']
+
+# # QUERY-STRINGS args
+# for key, value in agrs.items():
+#     os.environ["QS_" + str(key).upper()] = str(value).replace("%20", " ")
+
+# # # Setar os dados via post. Ex: PS_ID, PS_NOME ...
+
+
+
+# # # Executa o binário
+# os.system(dist_path + "/" + prog_cobol)
+
