@@ -5,11 +5,9 @@
 * Explorar as possibilidades de usar o Cobol para criação de micro serviços.
 
 ### LIMITAÇÕES
-* Só pega parâmetros via QUERY-STRING. Pegar dados do corpo da 
- requisição está em planejamento para ser implementado.
+
 * Somente acessa bancos de dados MariaDB, MYSQL e POSTGRESQL.
 * Para compilar programas que acessam banco de dados é usado um pré-processador de SQL.
-* A passagem de configurações é feita de forma manual no arquivo gateway.py
 
 ### SOFTWARES NECESSÁRIOS
 * git
@@ -146,14 +144,22 @@ Cobol. Cada programa deve ter sua seção na área de compilação.
 
 > Arquivo contendo o de-para entre a action passada na url e o binário Cobol que deve ser executado na pasta cgi-bin/dist
 
+> É possivel também para parametros do tipo inteiro na url:<br>
+Ex: /cliente/:id<br>
+Ex: /professor/:id/disciplina/:id/tutorados<br>
+
+
 ``` python
 
-	rotas = {}
-
-	rotas["CHAMADA-ESTATICA"]                   = "PROG-CHAMADA-ESTATICA"
-	rotas["CRIAR-TABELA-TESTE"]                 = "PROG-CRIAR-TABELA"
-	rotas["RECEBER-QUERY-STRING"]               = "PROG-QUERY-STRING"
-	rotas["CONSULTAR-TABELA-TESTE"]             = "PROG-CONSULTA-SQL"
+	from router import Router
+	 
+	router = Router()
+	
+	router.get(path="/cobweb/teste/criar-tabela", cobol_program="PROG-CRIAR-TABELA")
+	router.get(path="/cobweb/teste/consulta-tabela", cobol_program="PROG-CONSULTA-SQL")
+	router.get(path="/cobweb/teste/chamada-estatica", cobol_program="PROG-CHAMADA-ESTATICA")
+	router.get(path="/cobweb/teste/chamada-dinamica", cobol_program="PROG-CHAMADA-DINAMICA")
+	router.get(path="/cobweb/teste/chamada-query-string", cobol_program="PROG-QUERY-STRING")
 
 ```
 
@@ -165,7 +171,8 @@ Cobol. Cada programa deve ter sua seção na área de compilação.
 #### TESTAR COM CURL OU POSTMAN/INSOMNIA
 > Execute em sequência para a criação da tabela teste.
 
-* curl http://localhost:5300/cgi-bin/gateway.py?action=CHAMADA-ESTATICA
-* curl http://localhost:5300/cgi-bin/gateway.py?action=CRIAR-TABELA-TESTE
-* curl http://localhost:5300/cgi-bin/gateway.py?action=RECEBER-QUERY-STRING&id=34&nome=Marcos Oliveira
-* curl http://localhost:5300/cgi-bin/gateway.py?action=CONSULTAR-TABELA-TESTE
+* curl http://localhost:5300/cobweb/teste/criar-tabela
+* curl http://localhost:5300/cobweb/teste/consulta-tabela
+* curl http://localhost:5300/cobweb/teste/chamada-estatica
+* curl http://localhost:5300/cobweb/teste/chamada-dinamica
+* curl http://localhost:5300/cobweb/teste/chamada-query-string?id=10&nome=Mar

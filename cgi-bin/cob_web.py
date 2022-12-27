@@ -56,7 +56,8 @@ class CobWeb(object):
             os.environ[config['key']] = config['value']
 
         # QUERY-STRINGS args
-        agrs = cgi.parse()
+        agrs = dict(item.split('=') for item in os.environ['QUERY_STRING'].split('&') if item)
+        
         for key, value in agrs.items():
             os.environ["QS_" + str(key).upper()] = str(value).replace("%20", " ")
 
