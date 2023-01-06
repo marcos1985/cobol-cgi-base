@@ -166,6 +166,7 @@ Ex: /professor/:id/disciplina/:id/tutorados<br>
 
 >Todo parâmetro passado via JSON é acessado no código Cobol com um PS_ na frente do nome do parâmetro. Tudo deve ficar em caixa alta.
 
+> Somente aceita JSON simples com chave e valor. Não aceita JSON complexos com vários níveis.
 
 ```json
 
