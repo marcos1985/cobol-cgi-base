@@ -14,6 +14,8 @@
        WORKING-STORAGE SECTION.
        
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
+
+       77  WRK-ID-MASK                     PIC Z(9)9.
        
        77  WRK-MSG-ERRO                    PIC X(255).
        77  WRK-MSG-EXP-ERRO                PIC X(255).

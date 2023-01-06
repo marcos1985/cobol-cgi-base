@@ -24,8 +24,6 @@
        77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
 
        77  WRK-DB-STRING                   PIC X(255).
-
-       77  ajshja  PIC 9(10).
        
 
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.

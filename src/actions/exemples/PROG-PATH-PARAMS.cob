@@ -1,36 +1,50 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. PROG-CHAMADA-EXTERNA.
+       PROGRAM-ID. PROG-PATH-PARAMS.
       *******************************************
-      * AUTOR: 
-      * DATA: 
+      * AUTOR    : 
+      * DATA     : 
       ******************************************* 
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+       
        DATA DIVISION.
        FILE SECTION.
+
        WORKING-STORAGE SECTION.
-
+       
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
-       01  WRK-RETURN                      PIC X(255). 
 
+       77  WRK-CLIENTE-ID-MASK             PIC Z(9)9.
+       77  WRK-VENDA-ID-MASK               PIC Z(9)9.
+       
        77  WRK-MSG-ERRO                    PIC X(255).
        77  WRK-MSG-EXP-ERRO                PIC X(255).
        
-       77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
-       77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
+       77  WRK-HTTP-STATUS-200             PIC 9(3)    VALUE 200.
+       77  WRK-HTTP-STATUS-500             PIC 9(3)    VALUE 500.
+
+
+       
+       77  PATH-PARAM-CLIENTE-ID           PIC 9(10).
+       77  PATH-PARAM-VENDA-ID             PIC 9(10).
+
 
        PROCEDURE DIVISION.
 
        MAIN-PROCEDURE.
            
            PERFORM PROC-SETAR-CABECALHO-HTTP.
-           PERFORM PROC-CHAMA-MOD-TESTA-CALL.
+           PERFORM PROC-PROCESSAR-REQUEST-BODY.
            PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
-           PERFORM PROC-LIBERAR-RECURSOS.
            STOP RUN.
-       
 
+       PROC-PROCESSAR-REQUEST-BODY.
+           ACCEPT PATH-PARAM-CLIENTE-ID  
+                   FROM ENVIRONMENT "PATH_PARAM_1".
+           ACCEPT PATH-PARAM-VENDA-ID  
+                   FROM ENVIRONMENT "PATH_PARAM_2".
+           
        PROC-LIBERAR-RECURSOS.
            CONTINUE.
 
@@ -46,25 +60,27 @@
            DISPLAY '}'.
 
            STOP RUN.
-       
 
-       PROC-SETAR-CABECALHO-HTTP.    
+
+       PROC-SETAR-CABECALHO-HTTP.
+              
            DISPLAY "Access-Control-Allow-Origin: *".
            DISPLAY "Content-type: application/json".
-           DISPLAY WRK-NEWLINE. 
+           DISPLAY WRK-NEWLINE.
 
-       PROC-CHAMA-MOD-TESTA-CALL.
-           CALL 'MOD-TESTA-CALL' USING WRK-RETURN END-CALL.
        
        PROC-RETORNAR-RESPOSTA-HTTP-200.
-           
+               
+           MOVE PATH-PARAM-CLIENTE-ID TO WRK-CLIENTE-ID-MASK.
+           MOVE PATH-PARAM-VENDA-ID   TO WRK-VENDA-ID-MASK.
+
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
            DISPLAY '"msg": null,'.
-           DISPLAY '"data":'.
-               DISPLAY '{'.
-               DISPLAY '   "retorno": "' 
-                            FUNCTION trim(WRK-RETURN) '"'.
-               DISPLAY "}".
+           DISPLAY '"data": {'.
+           DISPLAY '"cliente_id":' WRK-CLIENTE-ID-MASK ','.
+           DISPLAY '"venda_id": '  WRK-VENDA-ID-MASK.
            DISPLAY "}".
-           
+           DISPLAY "}".
+       
+      

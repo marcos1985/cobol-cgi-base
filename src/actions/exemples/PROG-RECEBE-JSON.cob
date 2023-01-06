@@ -14,6 +14,8 @@
        WORKING-STORAGE SECTION.
        
        01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
+
+       77  WRK-ID-MASK                     PIC Z(9)9.
        
        77  WRK-MSG-ERRO                    PIC X(255).
        77  WRK-MSG-EXP-ERRO                PIC X(255).
@@ -66,12 +68,14 @@
        
        PROC-RETORNAR-RESPOSTA-HTTP-200.
 
+           MOVE PS-ID TO WRK-ID-MASK.
+
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
            DISPLAY '"msg": null,'.
            DISPLAY '"data": {'.
-           DISPLAY '"id":' PS-iD ','.
-           DISPLAY '"nome": "' PS-NOME '"'.
+           DISPLAY '"id":' WRK-ID-MASK ','.
+           DISPLAY '"nome": "' FUNCTION TRIM(PS-NOME) '"'.
            DISPLAY "}".
            DISPLAY "}".
        
