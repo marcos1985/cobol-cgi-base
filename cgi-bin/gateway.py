@@ -2,4 +2,5 @@
 
 from cob_web import CobWeb
 
-CobWeb.run()
+cob_web = CobWeb()
+cob_web.run()

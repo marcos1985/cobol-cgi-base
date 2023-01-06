@@ -144,4 +144,22 @@ if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-CHAMADA-DINAMICA" ) ]]; then
     echo ""
 fi
 
+# >> src/actions/PROG-PARSE-JSON.cob
+if [[ ( $1 == "TUDO" ) || ( $1 == "PROG-RECEBE-JSON" ) ]]; then
+
+    rm -f cgi-bin/dist/PROG-RECEBE-JSON
+
+    cobc -x -o PROG-RECEBE-JSON src/actions/PROG-RECEBE-JSON.cob
+    cp PROG-RECEBE-JSON cgi-bin/dist
+    
+    rm PROG-RECEBE-JSON
+
+    if [ $? -eq 0 ]; then 
+        printf "\xE2\x9C\x85 PROG-RECEBE-JSON"
+    else 
+        printf "\xF0\x9F\x9A\xAB PROG-RECEBE-JSON"
+    fi
+
+    echo ""
+fi
 
