@@ -103,7 +103,7 @@
            MOVE SPACES TO BUFFER.
 
            STRING 
-               'CREATE TABLE teste'
+               'CREATE TABLE acl.teste'
                '('
                    'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,'
                    'nome VARCHAR(255) NOT NULL'
@@ -123,7 +123,7 @@
            MOVE 'R1D8' TO NOME.
 
            EXEC SQL
-               INSERT INTO teste (nome)
+               INSERT INTO acl.teste (nome)
                VALUES (:NOME)
            END-EXEC.
            

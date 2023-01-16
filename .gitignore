@@ -3,3 +3,4 @@ cgi-bin/__pycache__
 mariadb/
 config.py
 README.md.backup
+db2/
