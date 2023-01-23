@@ -6,7 +6,7 @@
 
 ### LIMITAÇÕES
 
-* Somente acessa bancos de dados MariaDB, MYSQL e POSTGRESQL.
+* Somente acessa bancos de dados DB2, MariaDB, MYSQL e POSTGRESQL.
 
 ### SOFTWARES NECESSÁRIOS
 * git
