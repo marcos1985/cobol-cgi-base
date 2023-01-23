@@ -1,0 +1,51 @@
+
+# Seta imagem base UBUNTU 22.04
+FROM ubuntu/nginx
+
+# Seta a pasta onde o projeto vai ficar dentro do container.
+WORKDIR /app
+
+RUN apt update
+RUN apt install -y nano 
+RUN apt install -y fcgiwrap
+RUN apt install -y python3
+RUN apt install -y build-essential
+RUN apt install -y gnucobol
+RUN apt install -y unixodbc unixodbc-dev
+RUN apt install -y systemd
+RUN apt install -y systemctl
+
+# Instala os drivers ODBC dos bancos MariaBD/MYSQL e POSTGRESQL
+RUN apt install -y odbc-mdbtools
+RUN apt install -y odbc-mariadb 
+RUN apt install -y odbc-postgresql
+
+
+RUN pwd
+COPY gnu-cobol-sql-2.0.tar.gz .
+RUN  tar -xf gnu-cobol-sql-2.0.tar.gz && mv gnu-cobol-sql-2.0 cobol-sql
+#RUN cd cobol-sql
+
+RUN cobol-sql/configure
+RUN make cobol-sql
+RUN make install cobol-sql
+
+RUN make cobol-sql/ocsql
+RUN make install cobol-sql/ocsql
+RUN echo "/usr/local/lib" >> /etc/ld.so.conf.d/x86_64-linux-gnu.conf
+
+RUN rm -R *
+
+COPY fastcgi.conf /etc/nginx/fcgiwrap.conf
+RUN  rm /etc/nginx/sites-available/default
+COPY default.conf /etc/nginx/sites-available/default
+#RUN  systemctl enable fcgiwrap
+
+RUN mkdir /app/cgi-bin
+COPY teste.py /app/cgi-bin
+RUN chmod 775 /app/cgi-bin
+RUN chmod +x /app/cgi-bin/teste.py
+RUN chmod 705 /app/cgi-bin/teste.py
+
+EXPOSE 80
+EXPOSE 443
