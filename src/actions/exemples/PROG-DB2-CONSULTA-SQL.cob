@@ -1,26 +1,30 @@
        IDENTIFICATION DIVISION.
-       PROGRAM-ID. TESTA-ENV.
+       PROGRAM-ID. PROG-DB2-CONSULTA-SQL.
       *******************************************
-      * AUTOR    : 
-      * DATA     : 
+      * AUTOR: 
+      * DATA: 
       ******************************************* 
        ENVIRONMENT DIVISION.
        INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-       
+       FILE-CONTROL.       
        DATA DIVISION.
        FILE SECTION.
 
        WORKING-STORAGE SECTION.
-       
-       01  WRK-NEWLINE                     PIC X       VALUE x'0a'.
 
+       01  WRK-NEWLINE                     PIC X           VALUE x'0a'.
+
+       77  WRK-TEST-ID-MASK                PIC Z(8)9.
+       77  WRK-CONTADOR                    PIC 9(10)       VALUE ZERO.
+       
        77  WRK-MSG-ERRO                    PIC X(255).
        77  WRK-MSG-EXP-ERRO                PIC X(255).
        
        77  WRK-HTTP-STATUS-200             PIC 9(3)        VALUE 200.
        77  WRK-HTTP-STATUS-500             PIC 9(3)        VALUE 500.
+
        77  WRK-DB-STRING                   PIC X(255).
+       
 
        EXEC SQL BEGIN DECLARE SECTION END-EXEC.
        
@@ -30,9 +34,12 @@
            05 HVARC      PIC  X(50).
            05 HVARN      PIC  9(12).
        
-       77  NOME          PIC X(255).
+       01  SQL-01-VARS.
+           05 TEST-ID          PIC 9(10).
+           05 TEST-NOME        PIC X(255).
+           05 TEST-QTD         PIC 9(10).
           
-       EXEC SQL END DECLARE SECTION END-EXEC.
+       EXEC SQL END DECLARE SECTION END-EXEC. 
 
        PROCEDURE DIVISION.
 
@@ -40,13 +47,13 @@
            
            PERFORM PROC-SETAR-CABECALHO-HTTP.
            PERFORM PROC-CONECTAR-BANCO-COB-DEV.
-           PERFORM PROC-CRIAR-TABELA-TESTE.
-           PERFORM PROC-INSERIR-REGISTRO.
+           PERFORM PROC-CONTAR-ELEMENTOS-CONSULTA-TESTE.
+           PERFORM PROC-CRIAR-CURSOR-CONSULTA-TESTE.
            PERFORM PROC-RETORNAR-RESPOSTA-HTTP-200.
            PERFORM PROC-LIBERAR-RECURSOS.
            
            STOP RUN.
-           
+       
        PROC-LIBERAR-RECURSOS.
            EXEC SQL CONNECT RESET END-EXEC.
        
@@ -88,58 +95,72 @@
 
            PERFORM PROC-VERIFICAR-EXEC-SQL.
       
-       PROC-CRIAR-TABELA-TESTE.
+       PROC-CONTAR-ELEMENTOS-CONSULTA-TESTE.
            
-           MOVE SPACES TO BUFFER.
-
-           STRING 'DROP TABLE IF EXISTS teste;' INTO BUFFER.
-
-           EXEC SQL
-               EXECUTE IMMEDIATE :BUFFER
-           END-EXEC.
-
-           PERFORM PROC-VERIFICAR-EXEC-SQL.
-           
-           MOVE SPACES TO BUFFER.
-
-           STRING 
-               'CREATE TABLE acl.teste'
-               '('
-                   'id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,'
-                   'nome VARCHAR(255) NOT NULL'
-               ');'
-           INTO BUFFER
-           
-
            EXEC SQL 
-               EXECUTE IMMEDIATE :BUFFER
+               SELECT
+                   COUNT(*)
+               INTO :TEST-QTD
+               FROM acl.teste
            END-EXEC.
 
            PERFORM PROC-VERIFICAR-EXEC-SQL.
 
-       
-       PROC-INSERIR-REGISTRO.
-           
-           MOVE 'R1D8' TO NOME.
+       PROC-CRIAR-CURSOR-CONSULTA-TESTE.
 
            EXEC SQL
-               INSERT INTO acl.teste (nome)
-               VALUES (:NOME)
-           END-EXEC.
+               DECLARE CUR-TESTE CURSOR FOR 
+               SELECT 
+                   id,
+                   nome
+               FROM acl.teste
+           END-EXEC
+
+           PERFORM PROC-VERIFICAR-EXEC-SQL.
+
+           EXEC SQL
+               OPEN CUR-TESTE
+           END-EXEC
            
            PERFORM PROC-VERIFICAR-EXEC-SQL.
-
-           EXEC SQL COMMIT END-EXEC.
-           PERFORM PROC-VERIFICAR-EXEC-SQL.
-
        
+           
        PROC-RETORNAR-RESPOSTA-HTTP-200.
 
            DISPLAY '{'.
            DISPLAY '"http-status": ' WRK-HTTP-STATUS-200 ','.
            DISPLAY '"msg": null,'.
-           DISPLAY '"data":'.
-               DISPLAY '{'.
-               DISPLAY '   "tabela": "teste"'.
-               DISPLAY "}".
-           DISPLAY "}".
+           DISPLAY '"data" : ['.
+           
+           PERFORM UNTIL SQLCODE = 100
+               
+               EXEC SQL
+                   FETCH 
+                       CUR-TESTE
+                   INTO 
+                       :TEST-ID, 
+                       :TEST-NOME
+               END-EXEC
+               
+               IF SQLCODE NOT EQUAL 100 THEN
+                   
+                   ADD 1 TO WRK-CONTADOR
+    
+                   MOVE TEST-ID TO WRK-TEST-ID-MASK
+    
+                   DISPLAY '{'
+                   DISPLAY '"id": ' WRK-TEST-ID-MASK ', '
+                   DISPLAY '"nome": "' 
+                                       FUNCTION trim(TEST-NOME) '"'
+                   DISPLAY '}'
+                   
+                   IF WRK-CONTADOR < TEST-QTD THEN 
+                       DISPLAY ", "
+                   END-IF
+    
+               END-IF
+    
+           END-PERFORM.
+    
+           DISPLAY ']'.
+           DISPLAY '}'.
