@@ -103,7 +103,7 @@
 * Criar arquivo config.py
 	* cp cgi-bin/config.exemple.py cgi-bin/config.py
 
-* Subir os containers com GNU-COBOL e MariaDB
+* Subir os containers com GNU-COBOL e DB2
 	* docker-compose up
 
 * Verificar qual o id do container (Abrir outra aba do terminal)
