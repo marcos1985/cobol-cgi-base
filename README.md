@@ -6,7 +6,8 @@
 
 ### LIMITAÇÕES
 
-* Somente acessa bancos de dados DB2, MariaDB, MYSQL e POSTGRESQL.
+* Somente acessa os bancos de dados DB2, MariaDB, MYSQL e POSTGRESQL.
+* (Drivers incluídos na imagem)
 
 ### SOFTWARES NECESSÁRIOS
 * git
@@ -76,6 +77,11 @@
 		source_code="src/actions/exemples/MOD-DYN.cob",
 	    	object_name="MOD-DYN", access_database=False, 
 	    	dynamic_lib=True)
+	 
+	 
+	 .
+	 .
+	 .
 	             
 	compiler.compile()
 	
@@ -108,13 +114,13 @@
 	* **Exemplo**: docker exec -it 8728378728 bash
 
 * Compilar todos os programas cobol configurados no build.sh (Você deve estar dentro do container)
-	* bash build.sh TUDO
+	* bash build.sh ALL
 	
 ### ENTENDENDO O ARQUIVO ROUTES.PY
 
 > Arquivo contendo o de-para entre a action passada na url e o binário Cobol que deve ser executado na pasta cgi-bin/dist
 
-> É possivel também para parametros do tipo inteiro na url:<br>
+> É possivel também usar parametros do tipo inteiro na url:<br>
 Ex: /cliente/:id<br>
 Ex: /professor/:id/disciplina/:id/tutorados<br>
 
@@ -187,8 +193,9 @@ Ex: /professor/:id/disciplina/:id/tutorados<br>
 
 #### PORTAS EXPOSTAS
 
-* Porta COBOL:     5300
-* Porta MariaDB:   33061
+* Porta COBOL:      5300
+* DB2:			   50000
+* Porta MariaDB:    33061
 
 #### TESTAR COM CURL OU POSTMAN/INSOMNIA
 > Execute em sequência para a criação da tabela teste.
