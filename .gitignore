@@ -1,5 +1,7 @@
 cgi-bin/dist/*
 cgi-bin/__pycache__
+cgi-bin/__pycache__/*
+__pycache__/
 mariadb/
 config.py
 README.md.backup

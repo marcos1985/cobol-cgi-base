@@ -100,7 +100,7 @@ class CobolCompiler(object):
 
     def compile(self):
 
-        print("")
+        os.system("mkdir -p cgi-bin/dist")
 
         compilation_name = sys.argv[1]
 
