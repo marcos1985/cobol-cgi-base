@@ -63,8 +63,8 @@
 * Basta adicionar uma entrada no arquivo compile.py
 * executar o comando dentro do container:
 	* bash build.sh [nome da compilação]
-	* Ex 01: bash build.sh ALL
-	* Ex 02: bash build.sh C2020
+	* Ex 01: python3 compile.py ALL
+	* Ex 02: python3 compile.py C2020
 	
 ```python
 
@@ -113,8 +113,8 @@
 	* docker exec -it [id_do_container] bash
 	* **Exemplo**: docker exec -it 8728378728 bash
 
-* Compilar todos os programas cobol configurados no build.sh (Você deve estar dentro do container)
-	* bash build.sh ALL
+* Compilar todos os programas cobol configurados no compile.py (Você deve estar dentro do container)
+	* python3 compile.py ALL
 	
 ### ENTENDENDO O ARQUIVO ROUTES.PY
 
