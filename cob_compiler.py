@@ -27,12 +27,66 @@ class CobolProgram(object):
     def get_dynamic_lib(self):
         return self.__dynamic_lib
 
+# Karate DSL teste
+class KarateDSLTest(object):
+
+    def __init__(self, code, name, source) -> None:
+        
+        self.__code = code
+        self.__name = name
+        self.__source = source
+    
+    def get_code(self):
+        return self.__code
+    
+    def get_name(self):
+        return self.__name
+    
+    def get_source(self):
+        return self.__source
+
+class karateTestManager(object):
+
+    def __init__(self) -> None:
+        self.__karate_tests   = {}
+    
+    def add_karate_dsl_test(self, code, name, source):
+        self.__karate_tests[code] = KarateDSLTest(code, name, source)
+
+    def __karate_test_one(self, code):
+        
+        test = self.__karate_tests.get(code, None)
+
+        if not test:
+            print(f"Teste {code} não encontrado.")
+            sys.exit(1)
+        
+        os.system(f"java -jar /usr/local/bin/karate-1.4.0.jar {test.get_source()}")
+
+    def run_karate_dsl_test(self):
+
+        if not len(sys.argv) == 2:
+            print("Erro de sintaxe: deve ser passado o nome do teste ou a palavra ALL")
+            print("Exemplo: python3 test.py T0001")
+            print("Exemplo: python3 test.py ALL")
+            sys.exit(1)
+
+        test = sys.argv[1]
+        
+        if test.upper() == 'ALL':
+            
+            for key, karate_test in self.__karate_tests.items():
+                self.__karate_test_one(karate_test.get_code())
+
+        else:
+            self.__karate_test_one(test)
+
 class CobolCompiler(object):
 
     def __init__(self) -> None:
         
         self.__cobol_programs = []
-
+    
     def add(self, compilation_name, source_code, object_name, access_database, dynamic_lib):
         
         self.__cobol_programs.append(CobolProgram(compilation_name, source_code, object_name, access_database, dynamic_lib))

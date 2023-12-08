@@ -2,7 +2,7 @@ version: "3.6"
 services:
 
   cobol-dev:
-    image: "hyrumce/cobol-cgi:v3"
+    image: "cobol-cgi:v4"
     depends_on:
       # - mariadb-dev
       - db2
