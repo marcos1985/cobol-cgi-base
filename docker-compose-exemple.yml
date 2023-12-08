@@ -2,9 +2,10 @@ version: "3.6"
 services:
 
   cobol-dev:
-    image: "hyrumce/cobol-cgi:v2"
+    image: "cobol-cgi:v4"
     depends_on:
-      - mariadb-dev
+      # - mariadb-dev
+      - db2
     ports:
       - "5300:80"
     volumes:
@@ -12,26 +13,43 @@ services:
     networks:
       - backend
 
-  mariadb-dev:
-    image: "mariadb:latest"
-    #image: mariadb:10.2
-    hostname: cob-dev-db
+  # mariadb-dev:
+  #   image: "mariadb:latest"
+  #   #image: mariadb:10.2
+  #   hostname: cob-dev-db
+  #   ports:
+  #     - "33061:3306"
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: 123456
+  #     MYSQL_DATABASE: cob-dev
+  #     MYSQL_USER: root
+  #     MYSQL_PASSWORD: 123456
+  #   logging:
+  #     driver: syslog
+  #     options:
+  #       tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
+  #   networks:
+  #     - backend
+  #   restart: on-failure
+  #   volumes:
+  #    - ${PWD}/mariadb:/var/lib/mysql
+
+  db2:
+    image: ibmcom/db2
+    privileged: true
+    hostname: db2-cob-dev-db
     ports:
-      - "33061:3306"
+      - 50000:50000
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: cob-dev
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 123456
-    logging:
-      driver: syslog
-      options:
-        tag: "{{.DaemonName}}(image={{.ImageName}};name={{.Name}};id={{.ID}})"
+      # DB_USER: db2inst1
+      DB2INST1_PASSWORD: 123456
+      LICENSE: accept
+      DBNAME: COBDEV
+      command: 'db2start'
     networks:
       - backend
-    restart: on-failure
     volumes:
-     - ${PWD}/mariadb:/var/lib/mysql
+      - ${PWD}/db2:/database
 
 networks:
   frontend:

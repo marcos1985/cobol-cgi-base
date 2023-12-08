@@ -21,6 +21,16 @@ RUN apt install -y odbc-mdbtools
 RUN apt install -y odbc-mariadb 
 RUN apt install -y odbc-postgresql
 
+# Instala o CURL
+RUN apt install -y curl
+
+# Instala a JVM
+RUN apt install -y openjdk-11-jre
+
+# Instala a lib Karate DSL
+COPY karate-1.4.0.jar /usr/local/bin
+
+
 # Instala o driver para DB2
 COPY db2clidriver.tar.gz .
 RUN tar -xf db2clidriver.tar.gz && mv clidriver db2clidriver
